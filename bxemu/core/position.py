@@ -265,12 +265,16 @@ class Position(object):
         return self.__margin
     
     def reviseMargin(self):
-        if self.pm.leverageType == 0:  #全仓模式
-            if self.pm.wallet.availableBalance < 0:
-                self.__reviseOfMargin = self.pm.wallet.availableBalance
-            else:
-                self.__reviseOfMargin = 0
-            self.pm.wallet.positionMargin = self.margin
+        """
+        调整保证金展示方式
+        """
+        if self.isHolding():
+            if self.pm.leverageType == 0:  #全仓模式
+                if self.pm.wallet.availableBalance < 0:
+                    self.__reviseOfMargin = self.pm.wallet.availableBalance
+                else:
+                    self.__reviseOfMargin = 0
+                self.pm.wallet.positionMargin = self.margin
 
     def resetSomething(self):
         self.__reviseOfMargin = EMPTY_FLOAT
