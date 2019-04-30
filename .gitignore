@@ -1,0 +1,6 @@
+bxemu.egg-info
+__pycache__
+*.pyc
+*.wpr
+*.wpu
+.git
