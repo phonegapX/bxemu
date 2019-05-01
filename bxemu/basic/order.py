@@ -2,21 +2,23 @@
 
 from __future__ import division
 from __future__ import unicode_literals
+
 from datetime import datetime
+
 from bxemu.constant import *
+from bxemu.util.sequence import SequenceGenerator
 
 
 class Order(object):
     """
     订单数据类
     """
-    ORDER_ID_STEP = EMPTY_INT   #相当于静态变量
+    sg = SequenceGenerator()
 
     def __init__(self):
         """Constructor"""
-        Order.ORDER_ID_STEP += 1
         #委托相关
-        self.orderId = Order.ORDER_ID_STEP
+        self.orderId = Order.sg.get_next('order')
         self.side = EMPTY_UNICODE   #委托方向
         self.price = EMPTY_FLOAT    #委托价格
         self.size = EMPTY_INT       #委托数量

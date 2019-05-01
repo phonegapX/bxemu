@@ -7,19 +7,19 @@ import math
 from datetime import datetime
 
 from bxemu.constant import *
+from bxemu.util.sequence import SequenceGenerator
 
 
 class Trade(object):
     """
     成交数据类
     """
-    TRADE_ID_STEP = EMPTY_INT   #相当于静态变量
+    sg = SequenceGenerator()
 
     def __init__(self):
         """Constructor"""
-        Trade.TRADE_ID_STEP += 1
         #成交相关
-        self.tradeID = Trade.TRADE_ID_STEP    #成交编号
+        self.tradeID = Trade.sg.get_next('trade')    #成交编号
         self.side = EMPTY_UNICODE       #方向
         self.execQty = EMPTY_INT        #成交数量
         self.execPrice = EMPTY_FLOAT    #成交价格
