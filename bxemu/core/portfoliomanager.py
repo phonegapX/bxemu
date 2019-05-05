@@ -1,4 +1,5 @@
-#-*- coding:utf-8 –*-
+# -*- coding: utf-8 -*-
+
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
@@ -18,6 +19,7 @@ import math
 import random
 import copy
 
+from .statistic import Statistic
 from .position import Position
 from .wallet import Wallet
 from bxemu.constant import *
@@ -38,6 +40,7 @@ class PortfolioManager(object):
         self.lastMarkPrice = EMPTY_FLOAT   #最新合理标记价格
         self.lastFillPrice = EMPTY_FLOAT   #最新期货成交价格
         self.sg = SequenceGenerator()
+        self.stat = Statistic()
 
     def placeOrder(self, side, price, size):
         raise Exception("需要子类继承,并且实现此函数")
@@ -49,9 +52,9 @@ class PortfolioManager(object):
         raise Exception("需要子类继承,并且实现此函数")
 
     def _allowTrade(self, order, tradeVol, fillPrice, markPrice, tradeType):
-        '''
+        """
         判断是否允许成交(比如说一成交就会导致仓位爆仓的情况就不允许成交)
-        '''
+        """
         wallet = copy.deepcopy(self.wallet) #复制钱包,目的是不会影响真正的钱包
         tradeValue = round(100000000/fillPrice)*tradeVol    #成交价值        
         if tradeType == TRADE_TYPE_MAKER:
@@ -144,10 +147,10 @@ class PortfolioManager(object):
             return False
 
     def _obtainTransactionVolume(self, maxVolume):
-        '''
+        """
         用于模拟本次交易实际成交的数量,参数maxVolume是最大可成交数量,返回值为实际成交的数量
         这里设置两个随机数,一个随机数用于模拟是否全部成交,另一个随机数用于模拟在部分成交的情况下实际成交的数量
-        '''
+        """
         assert maxVolume > 0
         assert TV_PERCENTAGE >= 0 and TV_PERCENTAGE <= 100
         isPartial = False
@@ -160,9 +163,9 @@ class PortfolioManager(object):
         return volume
 
     def adjustLeverage(self, type):
-        '''
+        """
         目前只支持整数倍杠杆,不超过100倍,也不支持动态调整杠杆
-        '''
+        """
         assert type - (int(type)) == 0
         assert type >= 0 and type <= 100        
         self.leverageType = type
@@ -184,9 +187,11 @@ class PortfolioManager(object):
     def deposit(self, xbt):
         assert xbt > 0  #充值数量必须大于0
         self.wallet.walletBalance += xbt
+        #统计记录
+        self.stat.log(Statistic.OP_WALLET_DEPOSIT, self, None)
 
     def _calculateOrderMargin(self, orderBook, positionSize, positionSide):
-        '''
+        """
         在bitmex中一个<交易对>持仓有三种可能：1没有持仓 2持有多仓 3持有空仓
         
         举个例子(没有持仓的情况):
@@ -203,7 +208,7 @@ class PortfolioManager(object):
         1.持有空仓10张合约。卖空15张合约，买多6张合约，第一步先进行抵消操作，6张多单全部抵消完，只计算15张空单合约的委托保证金
         2.持有空仓10张合约。卖空15张合约，买多13张合约，第一步先进行抵消操作，13张多单抵消后还剩3张买多合约，然后再按之前的计算规则3<15,结果=3张多单合约的委托保证金+12张(15-3)空单合约的委托保证金
         3.持有空仓10张合约。卖空15张合约，买多27张合约，第一步先进行抵消操作，27张多单抵消后还剩17(27-10)张买多合约，然后再按之前的计算规则17>15, 只计算17张多单合约的委托保证金
-        '''
+        """
         
         longPosSize = 0     #所有多委单的仓位总和
         longPosValue = 0    #所有多委单的价值总和
@@ -312,9 +317,9 @@ class PortfolioManager(object):
         self.position.resetSomething()
 
     def notifyOrderChange(self, orderId):
-        '''
+        """
         成交导致仓位变化,仓位变化后此函数会被调用,目的主要是计算委托保证金
-        '''
+        """
         if sys.version_info.major == 2:
             l = filter(lambda order:order.orderId==orderId, self.orderBook)
         else:
@@ -346,7 +351,7 @@ class PortfolioManager(object):
         print("Trade total: %d"%(len(self.trades)))
         print("====================================================================================================================")       
 
-'''
+"""
 开仓,加仓,减仓,平仓
 
 开多仓:
@@ -435,4 +440,4 @@ class PortfolioManager(object):
 = 1 million microbitcoins (uBTC) 也就是100 0000
 = 100 million Satoshi 也就是1亿（10000 0000）
 
-'''
+"""

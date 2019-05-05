@@ -1,4 +1,4 @@
-#-*- coding:utf-8 –*-
+# -*- coding: utf-8 -*-
 
 from __future__ import absolute_import
 from __future__ import division
@@ -33,7 +33,7 @@ class TestStrategy(StrategyTemplate):
     def onTick(self, tick):
         """收到行情TICK推送"""
         try:
-            '''
+            """
             Sell	107	5567.0	1,922,041 XBt	0.0750%	1,441 XBt	Market	900	0	5567.0
             Sell	265	5567.0	4,760,195 XBt	0.0750%	3,570 XBt	Market	900	107	5567.0
             Sell	25	5567.5	449,025 XBt	0.0750%	336 XBt	        Market	900	372	5567.0
@@ -44,7 +44,7 @@ class TestStrategy(StrategyTemplate):
             Sell	29	5568.0	520,840 XBt	0.0750%	390 XBt	        Market	900	721	5567.0
             Sell	150	5568.0	2,694,000 XBt	0.0750%	2,020 XBt	Market	900	750	5567.0
             Sell	100	5568.0	1,796,000 XBt	0.0750%	1,347 XBt	Market	100	0	5568.0            
-            '''
+            """
             if tick.lastFillPrice == 5568.0:
                 self.pm.placeOrder(DIRECTION_SELL, 5568.0, 100)
                 self.pm.placeOrder(DIRECTION_SELL, 5568.0, 150)
@@ -64,7 +64,7 @@ class TestStrategy(StrategyTemplate):
                 self.pm.placeOrder(DIRECTION_BUY, 3000.0, 90000)
                 self.pm.placeOrder(DIRECTION_BUY, 3000.0, 10000)
 
-            '''
+            """
             Buy	125	5569.0	-2,244,625 XBt	0.0750%	 1,683 XBt	Market	125	0	5569.0	
             
             Buy	409	5569.0	-7,344,413 XBt	0.0750%	 5,508 XBt	Market	875	0	5569.0	
@@ -75,7 +75,7 @@ class TestStrategy(StrategyTemplate):
             Buy	46	5568.5	-826,068 XBt	0.0750%	 619 XBt        Market	875	769	5569.0	
             Buy	50	5568.5	-897,900 XBt	0.0750%	 673 XBt        Market	875	815	5569.0	
             Buy	10	5568.5	-179,580 XBt	0.0750%	 134 XBt	Market	875	865	5569.0	                
-            '''
+            """
             if tick.lastFillPrice == 5568.5:     
                 self.pm.placeOrder(DIRECTION_BUY, 5568.5, 10)
                 self.pm.placeOrder(DIRECTION_BUY, 5568.5, 50)

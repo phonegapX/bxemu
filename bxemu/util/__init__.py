@@ -1,4 +1,4 @@
-#-*- coding:utf-8 –*-
+# -*- coding: utf-8 -*-
 
-from fileio import *
-from sequence import *
+from .fileio import *
+from .sequence import *

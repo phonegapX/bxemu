@@ -1,4 +1,4 @@
-#-*- coding:utf-8 –*-
+# -*- coding: utf-8 -*-
 
 from __future__ import absolute_import
 from __future__ import print_function
@@ -21,15 +21,15 @@ class BacktestAccount(PortfolioManager):
         super(BacktestAccount, self).__init__()
 
     def preOrderCheck(fn):
-        '''
+        """
         先要做下单前的检查，检查通过才可以下单
-        '''
+        """
         @wraps(fn)
         def wrap(*args, **kwargs):
-            '''
+            """
             1.只能在策略里面调用
             2.下单数是否超过了持仓数
-            '''
+            """
             stack = inspect.stack()
             curClass = stack[1][0].f_locals["self"].__class__
             methodName = stack[1][0].f_code.co_name
@@ -93,17 +93,17 @@ class BacktestAccount(PortfolioManager):
                 self.strategy.onOrder(order)
 
     def _makeTrade(self):
-        '''
+        """
         撮合交易
-        '''
+        """
         for order in self.orderBook[:]:
             self._deal(order, TRADE_TYPE_MAKER)
 
     def processQuote(self, tupleQuote):
-        '''
+        """
         调用_makeTrade撮合订单
         调用策略的onTick
-        '''
+        """
         self.lastMarkPrice, self.lastFillPrice = tupleQuote
         #
         self._makeTrade()

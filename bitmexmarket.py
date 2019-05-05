@@ -1,4 +1,4 @@
-#-*- coding:utf-8 –*-
+# -*- coding: utf-8 -*-
 
 from __future__ import absolute_import
 from __future__ import division
@@ -70,12 +70,12 @@ class BacktestBitMEXMarket(object):
         pass
     
     def run(self):
-        '''  
+        """
         1.创建账户实例，可多个
         2.为每个账户实例绑定对应的策略
         3.从实时数据源/数据库/模拟数据源等读取行情数据
         4.循环调用processQuote
-        '''
+        """
         
         self.account = BacktestAccount()
         self.account.bindStrategy(MarketMakingStrategy)

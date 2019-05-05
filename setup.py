@@ -1,8 +1,8 @@
-#-*- coding:utf-8 –*-
+# -*- coding: utf-8 -*-
 
-'''
+"""
 bxemu - bitmex xbt emulator.
-'''
+"""
 
 from setuptools import setup, find_packages
 import codecs

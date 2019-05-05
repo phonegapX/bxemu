@@ -1,4 +1,4 @@
-#-*- coding:utf-8 –*-
+# -*- coding: utf-8 -*-
 
 from __future__ import division
 from __future__ import unicode_literals
@@ -17,8 +17,7 @@ class Order(object):
 
     def __init__(self):
         """Constructor"""
-        #委托相关
-        self.orderId = Order.sg.get_next('order')
+        self.orderId = Order.sg.get_next('order')   #订单ID
         self.side = EMPTY_UNICODE   #委托方向
         self.price = EMPTY_FLOAT    #委托价格
         self.size = EMPTY_INT       #委托数量
@@ -40,8 +39,8 @@ class Order(object):
 
     @property
     def value(self):
-        '''
+        """
         委托价值
-        '''
+        """
         return round(100000000/self.price)*self.left
     

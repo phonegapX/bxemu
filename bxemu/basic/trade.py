@@ -1,4 +1,4 @@
-#-*- coding:utf-8 –*-
+# -*- coding: utf-8 -*-
 
 from __future__ import division
 from __future__ import unicode_literals
@@ -18,7 +18,6 @@ class Trade(object):
 
     def __init__(self):
         """Constructor"""
-        #成交相关
         self.tradeID = Trade.sg.get_next('trade')    #成交编号
         self.side = EMPTY_UNICODE       #方向
         self.execQty = EMPTY_INT        #成交数量

@@ -1,4 +1,5 @@
-#-*- coding:utf-8 –*-
+# -*- coding: utf-8 -*-
+
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
@@ -19,6 +20,7 @@ import math
 import sympy
 
 from bxemu.constant import *
+from .statistic import Statistic
 
 
 class Position(object):
@@ -32,9 +34,9 @@ class Position(object):
         self.pm = pm
 
     def clean(self):
-        '''
+        """
         清空仓位
-        '''
+        """
         self.__side = EMPTY_UNICODE         #持仓方向(多仓或空仓)
         self.__size = EMPTY_INT             #目前仓位数量
         self.__entryValue = EMPTY_FLOAT     #开仓价值(界面没有显示): 多个成交(价值)累加
@@ -49,9 +51,9 @@ class Position(object):
         self.__reviseOfMargin = EMPTY_FLOAT
 
     def holding(fn):
-        '''
+        """
         装饰器函数,当前是否持有仓位
-        '''
+        """
         @wraps(fn)
         def wrap(self, *args, **kwargs):
             if not self.isHolding():
@@ -60,18 +62,18 @@ class Position(object):
         return wrap
 
     def isHolding(self):
-        '''
+        """
         当前是否持有仓位
-        '''
+        """
         if self.side == EMPTY_UNICODE or self.size == EMPTY_INT or self.entryValue == EMPTY_FLOAT or self.entryPrice == EMPTY_FLOAT:
             return False
         else:
             return True
 
     def bankruptcyCheck(fn):
-        '''
+        """
         装饰器函数,检查仓位是否破产
-        '''
+        """
         @wraps(fn)
         def wrap(self, *args, **kwargs):
             result = None
@@ -86,9 +88,9 @@ class Position(object):
         return wrap
 
     def isBankruptcy(self):
-        '''
+        """
         检查当前仓位是否被强平
-        '''
+        """
         result = False
         try:
             if not self.isHolding():
@@ -118,6 +120,8 @@ class Position(object):
             self.pm.cancelAllOfOrders() #释放所有委托单,释放委托保证金
             self.pm.wallet.unrealisedPNL = EMPTY_FLOAT
             self.pm.wallet.positionMargin = EMPTY_FLOAT
+        #统计记录
+        self.pm.stat.log(Statistic.OP_POSITION_BANKRUPTCY, self.pm, None)
 
     @holding
     @bankruptcyCheck
@@ -197,7 +201,9 @@ class Position(object):
     @property
     @holding
     def value(self):
-        #价值(当前): 100000000/标记价格,结果四乘五入,再乘以仓位数量
+        """
+        价值(当前): 100000000/标记价格,结果四乘五入,再乘以仓位数量
+        """
         self.__value = round(100000000/self.markPrice)*self.size
         return self.__value
 
@@ -338,9 +344,9 @@ class Position(object):
         return self.calcFR(self.side)
 
     def _longOpen(self, trade): 
-        '''
+        """
         开多仓
-        '''
+        """
         #持仓方向
         self.side = trade.side
         #目前仓位数量
@@ -359,9 +365,9 @@ class Position(object):
         self.pm.wallet.positionMargin = self.margin         #更新钱包余额,只模拟一个合约的情形
 
     def _longIncrease(self, trade): 
-        '''
+        """
         持有多仓的情况下加仓
-        '''
+        """
         #目前仓位数量
         self.size += trade.execQty
         #开仓价值(界面没有显示)
@@ -377,10 +383,10 @@ class Position(object):
         self.pm.wallet.unrealisedPNL = self.unrealisedPNL   #更新钱包余额,只模拟一个合约的情形
         self.pm.wallet.positionMargin = self.margin         #更新钱包余额,只模拟一个合约的情形
 
-    def _longReduction(self, trade): 
-        '''
+    def _longDecrease(self, trade): 
+        """
         持有多仓的情况下减仓
-        '''
+        """
         #目前仓位数量
         if trade.execQty < self.size:       #部分平仓
             x = round(self.entryValue/self.size)*trade.execQty
@@ -419,21 +425,21 @@ class Position(object):
             self.realisedPNL += tmp
 
     def _shortOpen(self, trade): 
-        '''
+        """
         开空仓
-        '''
+        """
         self._longOpen(trade) #代码相同
     
     def _shortIncrease(self, trade):
-        '''
+        """
         持有空仓的情况下加仓
-        '''
+        """
         self._longIncrease(trade)   #代码相同
     
-    def _shortReduction(self, trade): 
-        '''
+    def _shortDecrease(self, trade): 
+        """
         持有空仓的情况下减仓
-        '''
+        """
         #目前仓位数量
         if trade.execQty < self.size:       #部分平仓
             x = round(self.entryValue/self.size)*trade.execQty
@@ -476,20 +482,28 @@ class Position(object):
         if trade.side == DIRECTION_BUY: #买单成交
             if self.size == 0:     #当前没有持仓,开多仓
                 self._longOpen(trade)
+                op = Statistic.OP_POSITION_OPEN
             elif self.size > 0 and self.side == DIRECTION_BUY:    #当前持有多仓,进行加仓
                 self._longIncrease(trade)
+                op = Statistic.OP_POSITION_INCREASE
             elif self.size > 0 and self.side == DIRECTION_SELL:   #当前持有空仓,进行减仓
-                self._shortReduction(trade)
+                self._shortDecrease(trade)
+                op = Statistic.OP_POSITION_DECREASE
         elif trade.side == DIRECTION_SELL:  #卖单成交
             if self.size == 0:     #当前没有持仓,开空仓
                 self._shortOpen(trade)
+                op = Statistic.OP_POSITION_OPEN
             elif self.size > 0 and self.side == DIRECTION_BUY:    #当前持有多仓,进行减仓
-                self._longReduction(trade)
+                self._longDecrease(trade)
+                op = Statistic.OP_POSITION_DECREASE
             elif self.size > 0 and self.side == DIRECTION_SELL:   #当前持有空仓,进行加仓
                 self._shortIncrease(trade)
+                op = Statistic.OP_POSITION_INCREASE
         #=================================================================================
         self.pm.notifyOrderChange(trade.orderId)            #委托单变化通知,主要目的是计算委托单保证金
-        #
+        #调整保证金的展示方式
         self.reviseMargin()
+        #统计记录
+        self.pm.stat.log(op, self.pm, trade)
         #
         #所有数据都已经准备完毕,这个时候可以计算仓位是否破产(破产检查代码放到了装饰器函数里面)

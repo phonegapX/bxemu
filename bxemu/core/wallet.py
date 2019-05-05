@@ -1,4 +1,5 @@
-#-*- coding:utf-8 –*-
+# -*- coding: utf-8 -*-
+
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
@@ -26,7 +27,6 @@ class Wallet(object):
         self.clean()
     
     def clean(self):
-        #钱包相关
         self.__walletBalance = EMPTY_FLOAT    #钱包余额 (存款+提款+已实现盈亏)
         self.__unrealisedPNL = EMPTY_FLOAT    #未实现盈亏 (所有未平仓合约的当前盈亏)
         self.__marginBalance = EMPTY_FLOAT    #保证金余额 (你在交易所的总权益。保证金余额=钱包余额+未实现盈亏) 
