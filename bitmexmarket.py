@@ -17,11 +17,13 @@ except NameError:  # Python 3
 from bxemu.constant import *
 from bxemu.bitmexaccount import BacktestAccount
 from bxemu.strategy import StrategyTemplate
+import bxemu.util as util
+import rootpath
 
 
 class MarketMakingStrategy(StrategyTemplate):
     """
-    做市商策略
+    简单做市商策略
     """
     
     once = 1
@@ -72,7 +74,7 @@ class BacktestBitMEXMarket(object):
         1.创建账户实例，可多个
         2.为每个账户实例绑定对应的策略
         3.从实时数据源/数据库/模拟数据源等读取行情数据
-        4.循环调用_processQuote
+        4.循环调用processQuote
         '''
         
         self.account = BacktestAccount()
@@ -81,13 +83,10 @@ class BacktestBitMEXMarket(object):
         self.account.deposit(100000000) #给账户充值
         self.account.adjustLeverage(1)  #设置当前账户的杠杆倍数
 
-        tupleQuote1 = (6162.34, 4989.00)
-        tupleQuote2 = (14262.34, 5089.00)
-        #tupleQuote2 = (7000.33, 7000.0)
-        l = [tupleQuote1, tupleQuote2]
+        listQuote = util.load_pickle(rootpath.join_relative_path("simple_quote.list"))
 
-        for x in range(2):
-            self.account.processQuote(l[x])
+        for x in listQuote:
+            self.account.processQuote((x, x))
 
 #===============================================================================
 #===============================================================================

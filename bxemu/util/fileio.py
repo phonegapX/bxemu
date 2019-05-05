@@ -9,7 +9,8 @@ except ImportError:
     import pickle
 import codecs
 
-SOURCE_ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+import pandas as pd
+
 
 def create_dir(filename):
     """
@@ -18,7 +19,6 @@ def create_dir(filename):
     Parameters
     ----------
     filename : str
-
     """
     if not os.path.exists(os.path.dirname(filename)):
         try:
@@ -40,7 +40,6 @@ def read_json(fp):
     Returns
     -------
     dict
-
     """
     content = dict()
     try:
@@ -60,7 +59,6 @@ def save_json(serializable, file_name):
     ----------
     serializable : object
     file_name : str
-
     """
     fn = os.path.abspath(file_name)
     create_dir(fn)
@@ -81,7 +79,6 @@ def load_pickle(fp):
     Returns
     -------
     object or None
-
     """
     content = None
     try:
@@ -101,7 +98,6 @@ def save_pickle(obj, file_name):
     ----------
     obj : object
     file_name : str
-
     """
     fn = os.path.abspath(file_name)
     create_dir(fn)
@@ -110,14 +106,8 @@ def save_pickle(obj, file_name):
         pickle.dump(obj, f)
 
 
-def join_relative_path(*paths):
-    """Get absolute path using paths that are relative to project root."""
-    return os.path.abspath(os.path.join(SOURCE_ROOT_DIR, *paths))
-
-
 def fig2base64(fig, format='png'):
     """
-    
     Parameters
     ----------
     fig : matplotlib.fig.Figure
@@ -126,7 +116,6 @@ def fig2base64(fig, format='png'):
 
     Returns
     -------
-
     """
     try:
         import BytesIO as io
@@ -139,4 +128,41 @@ def fig2base64(fig, format='png'):
     bytes_io.seek(0)
     s = bytes_io.read()
     res = base64.b64encode(s)
+    return res
+
+
+def save_h5(fp, dic):
+    """
+    Save data in dic to a hd5 file.
+
+    Parameters
+    ----------
+    fp : str
+        File path.
+    dic : dict
+    """
+    import warnings
+    warnings.filterwarnings('ignore', category=pd.io.pytables.PerformanceWarning)
+    #
+    create_dir(fp)
+    h5 = pd.HDFStore(fp, complevel=9, complib='blosc')
+    for key, value in dic.items():
+        h5[key] = value
+    h5.close()
+
+
+def load_h5(fp):
+    """
+    Load data and meta_data from hd5 file.
+
+    Parameters
+    ----------
+    fp : str, optional
+        File path of pre-stored hd5 file.
+    """
+    h5 = pd.HDFStore(fp)
+    res = dict()
+    for key in h5.keys():
+        res[key] = h5.get(key)
+    h5.close()
     return res

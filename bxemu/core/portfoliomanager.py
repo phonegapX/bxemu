@@ -21,6 +21,7 @@ import copy
 from .position import Position
 from .wallet import Wallet
 from bxemu.constant import *
+from bxemu.util.sequence import SequenceGenerator
 
 
 class PortfolioManager(object):
@@ -36,6 +37,7 @@ class PortfolioManager(object):
         self.leverageType = EMPTY_INT   #杠杆类型(0到100),0代表全仓模式
         self.lastMarkPrice = EMPTY_FLOAT   #最新合理标记价格
         self.lastFillPrice = EMPTY_FLOAT   #最新期货成交价格
+        self.sg = SequenceGenerator()
 
     def placeOrder(self, side, price, size):
         raise Exception("需要子类继承,并且实现此函数")
@@ -326,7 +328,10 @@ class PortfolioManager(object):
 
     def _outputStatus(self):
         #os.system('cls')
-        print("====================================================================================================================")        
+        #os.system('clear')
+        print("====================================================================================================================")
+        print("Market traded price: %-8.2f  Market mark price: %-8.2f  Count: %-8d"%(self.lastFillPrice, self.lastMarkPrice, self.sg.get_next('count')))
+        print("")
         print("%-13s  %-13s  %-13s  %-13s  %-13s  %-13s  %-13s  %-13s  %-13s"%("Size", "Side", "Value", "EntryPrice", "MarkPrice", "LiqPrice", "Margin", "UnrealisedPNL", "RealisedPNL"))
         if self.position.isHolding():
             print("%-13d  %-13s  %-13.0f  %-13.2f  %-13.2f  %-13.2f  %-13.0f  %-13.0f  %-13.0f"%(self.position.size, self.position.side, self.position.value, self.position.entryPrice, self.position.markPrice, self.position.liqPrice, self.position.margin, self.position.unrealisedPNL, self.position.realisedPNL))
