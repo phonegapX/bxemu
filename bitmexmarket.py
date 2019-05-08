@@ -77,16 +77,16 @@ class BacktestBitMEXMarket(object):
         4.循环调用processQuote
         """
         
-        self.account = BacktestAccount()
+        self.account = BacktestAccount("test_1")
         self.account.bindStrategy(MarketMakingStrategy)
         
         self.account.deposit(100000000) #给账户充值
         self.account.adjustLeverage(1)  #设置当前账户的杠杆倍数
 
         listQuote = util.load_pickle(rootpath.join_relative_path("simple_quote.list"))
-
-        for x in listQuote:
-            self.account.processQuote((x, x))
+        if listQuote:
+            for x in listQuote:
+                self.account.processQuote((x, x))
 
 #===============================================================================
 #===============================================================================

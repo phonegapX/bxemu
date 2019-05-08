@@ -17,8 +17,8 @@ from bxemu.constant import *
 
 class BacktestAccount(PortfolioManager):
     
-    def __init__(self):
-        super(BacktestAccount, self).__init__()
+    def __init__(self, name):
+        super(BacktestAccount, self).__init__(name)
 
     def preOrderCheck(fn):
         """

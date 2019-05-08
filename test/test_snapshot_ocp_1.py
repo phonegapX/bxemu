@@ -109,7 +109,7 @@ class BacktestBitMEXMarket(object):
         pass
     
     def run(self):  
-        self.account = BacktestAccount()
+        self.account = BacktestAccount("test")
         self.account.bindStrategy(TestStrategy)
         
         self.account.deposit(112753569) #给账户充值

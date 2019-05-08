@@ -26,12 +26,16 @@ from bxemu.constant import *
 from bxemu.util.sequence import SequenceGenerator
 
 
+def XBt_to_XBT(XBt):
+    return float(XBt) / XBt_TO_XBT
+
 class PortfolioManager(object):
     """
     投资管理
     """
     
-    def __init__(self):
+    def __init__(self, name):
+        self.name = name                #账户名,用于区分多个账户
         self.orderBook = []             #订单簿
         self.trades = []                #成交列表
         self.position = Position(self)  #持仓信息
@@ -335,18 +339,27 @@ class PortfolioManager(object):
         #os.system('cls')
         #os.system('clear')
         print("====================================================================================================================")
-        print("Market traded price: %-8.2f  Market mark price: %-8.2f  Count: %-8d"%(self.lastFillPrice, self.lastMarkPrice, self.sg.get_next('count')))
+        print("Account: %-8s  Currency: %-4s  Quote: USD  Leverage: %-3d  LastTradePrice: %-8.2f  LastMarkPrice: %-8.2f  Count: %-8d"%(self.name, PREFERENCES_CURRENCY, self.leverageType, self.lastFillPrice, self.lastMarkPrice, self.sg.get_next('count')))
         print("")
         print("%-13s  %-13s  %-13s  %-13s  %-13s  %-13s  %-13s  %-13s  %-13s"%("Size", "Side", "Value", "EntryPrice", "MarkPrice", "LiqPrice", "Margin", "UnrealisedPNL", "RealisedPNL"))
         if self.position.isHolding():
-            print("%-13d  %-13s  %-13.0f  %-13.2f  %-13.2f  %-13.2f  %-13.0f  %-13.0f  %-13.0f"%(self.position.size, self.position.side, self.position.value, self.position.entryPrice, self.position.markPrice, self.position.liqPrice, self.position.margin, self.position.unrealisedPNL, self.position.realisedPNL))
+            if PREFERENCES_CURRENCY == CURRENCY_XBt:
+                print("%-13d  %-13s  %-13.0f  %-13.2f  %-13.2f  %-13.2f  %-13.0f  %-13.0f  %-13.0f"%(self.position.size, self.position.side, self.position.value, self.position.entryPrice, self.position.markPrice, self.position.liqPrice, self.position.margin, self.position.unrealisedPNL, self.position.realisedPNL))
+            else:
+                print("%-13d  %-13s  %-13.6f  %-13.2f  %-13.2f  %-13.2f  %-13.6f  %-13.6f  %-13.6f"%(self.position.size, self.position.side, XBt_to_XBT(self.position.value), self.position.entryPrice, self.position.markPrice, self.position.liqPrice, XBt_to_XBT(self.position.margin), XBt_to_XBT(self.position.unrealisedPNL), XBt_to_XBT(self.position.realisedPNL)))
         print("")
         print("%-15s  %-15s  %-15s  %-15s  %-15s  %-15s"%("WalletBalance", "UnrealisedPNL", "MarginBalance", "PositionMargin", "OrderMargin", "AvailableBalance"))
-        print("%-15.0f  %-15.0f  %-15.0f  %-15.0f  %-15.0f  %-15.0f"%(self.wallet.walletBalance, self.wallet.unrealisedPNL, self.wallet.marginBalance, self.wallet.positionMargin, self.wallet.orderMargin, self.wallet.availableBalance))
+        if PREFERENCES_CURRENCY == CURRENCY_XBt:
+            print("%-15.0f  %-15.0f  %-15.0f  %-15.0f  %-15.0f  %-15.0f"%(self.wallet.walletBalance, self.wallet.unrealisedPNL, self.wallet.marginBalance, self.wallet.positionMargin, self.wallet.orderMargin, self.wallet.availableBalance))
+        else:
+            print("%-15.6f  %-15.6f  %-15.6f  %-15.6f  %-15.6f  %-15.6f"%(XBt_to_XBT(self.wallet.walletBalance), XBt_to_XBT(self.wallet.unrealisedPNL), XBt_to_XBT(self.wallet.marginBalance), XBt_to_XBT(self.wallet.positionMargin), XBt_to_XBT(self.wallet.orderMargin), XBt_to_XBT(self.wallet.availableBalance)))
         print("")
         print("%-12s  %-12s  %-12s  %-12s  %-12s  %-12s  %-12s  %-12s"%("OrderID", "Side", "Qty", "OrderPrice", "Remaining", "OrderValue", "Type", "Status"))
         for order in self.orderBook:
-            print("%-12d  %-12s  %-12d  %-12.2f  %-12d  %-12.0f  %-12s  %-12s"%(order.orderId, order.side, order.size, order.price, order.left, order.value, order.type, order.status))
+            if PREFERENCES_CURRENCY == CURRENCY_XBt:
+                print("%-12d  %-12s  %-12d  %-12.2f  %-12d  %-12.0f  %-12s  %-12s"%(order.orderId, order.side, order.size, order.price, order.left, order.value, order.type, order.status))
+            else:
+                print("%-12d  %-12s  %-12d  %-12.2f  %-12d  %-12.6f  %-12s  %-12s"%(order.orderId, order.side, order.size, order.price, order.left, XBt_to_XBT(order.value), order.type, order.status))
         print("")
         print("Trade total: %d"%(len(self.trades)))
         print("====================================================================================================================")       
