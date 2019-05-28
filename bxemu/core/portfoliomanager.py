@@ -43,6 +43,7 @@ class PortfolioManager(object):
         self.leverageType = EMPTY_INT   #杠杆类型(0到100),0代表全仓模式
         self.lastMarkPrice = EMPTY_FLOAT   #最新合理标记价格
         self.lastFillPrice = EMPTY_FLOAT   #最新期货成交价格
+        self.lastQuoteTime = None       #最后报价时间
         self.sg = SequenceGenerator()
         self.stat = Statistic()
 

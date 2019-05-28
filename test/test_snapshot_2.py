@@ -14,6 +14,8 @@ except NameError:  # Python 3
     from importlib import reload
     reload(sys)
 
+from datetime import datetime
+
 from bxemu.constant import *
 from bxemu.bitmexaccount import BacktestAccount
 from bxemu.strategy import StrategyTemplate
@@ -61,7 +63,7 @@ class BacktestBitMEXMarket(object):
         self.account.deposit(112784815) #给账户充值
         self.account.adjustLeverage(3)  #
 
-        tupleQuote1 = (5484.61, 5562.00)
+        tupleQuote1 = (5484.61, 5562.00, datetime.now())
         self.account.processQuote(tupleQuote1)
         
 

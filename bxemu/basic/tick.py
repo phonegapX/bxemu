@@ -19,8 +19,9 @@ class Tick(object):
         self.time = datetime.now()
         
     @classmethod
-    def create(cls, lastMarkPrice, lastFillPrice):
+    def create(cls, lastMarkPrice, lastFillPrice, lastQuoteTime):
         tick = cls()
         tick.lastMarkPrice = lastMarkPrice
         tick.lastFillPrice = lastFillPrice
+        tick.time = lastQuoteTime
         return tick

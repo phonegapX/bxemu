@@ -14,6 +14,8 @@ except NameError:  # Python 3
     from importlib import reload
     reload(sys)
 
+from datetime import datetime
+
 from bxemu.constant import *
 from bxemu.bitmexaccount import BacktestAccount
 from bxemu.strategy import StrategyTemplate
@@ -76,31 +78,31 @@ class BacktestBitMEXMarket(object):
         self.account.deposit(112753569) #给账户充值
         self.account.adjustLeverage(0)  #
 
-        tupleQuote1 = (5487.24, 5568.00)
+        tupleQuote1 = (5487.24, 5568.00, datetime.now())
         self.account.processQuote(tupleQuote1)  
         
-        tupleQuote2 = (5487.24, 5567.50)
+        tupleQuote2 = (5487.24, 5567.50, datetime.now())
         self.account.processQuote(tupleQuote2)
         
-        tupleQuote3 = (5487.24, 5567.00)
+        tupleQuote3 = (5487.24, 5567.00, datetime.now())
         self.account.processQuote(tupleQuote3)
         
-        tupleQuote4 = (5700.24, 5700.5)
+        tupleQuote4 = (5700.24, 5700.5, datetime.now())
         self.account.processQuote(tupleQuote4)   
         
-        tupleQuote5 = (5900.95, 5900.0)
+        tupleQuote5 = (5900.95, 5900.0, datetime.now())
         self.account.processQuote(tupleQuote5)
         
-        tupleQuote6 = (6100.39, 6100.0)
+        tupleQuote6 = (6100.39, 6100.0, datetime.now())
         self.account.processQuote(tupleQuote6)
         
-        tupleQuote7 = (6147.00, 6147.0)
+        tupleQuote7 = (6147.00, 6147.0, datetime.now())
         self.account.processQuote(tupleQuote7)
         
-        tupleQuote8 = (6180.55, 6180.55)
+        tupleQuote8 = (6180.55, 6180.55, datetime.now())
         self.account.processQuote(tupleQuote8)
         
-        tupleQuote9 = (6182.05, 6182.0)
+        tupleQuote9 = (6182.05, 6182.0, datetime.now())
         self.account.processQuote(tupleQuote9)
 #===============================================================================
 #===============================================================================

@@ -14,6 +14,11 @@ except NameError:  # Python 3
     from importlib import reload
     reload(sys)
 
+import datetime
+import sqlite3
+
+import pandas as pd
+
 from bxemu.constant import *
 from bxemu.bitmexaccount import BacktestAccount
 from bxemu.strategy import StrategyTemplate
@@ -83,10 +88,24 @@ class BacktestBitMEXMarket(object):
         self.account.deposit(100000000) #给账户充值
         self.account.adjustLeverage(1)  #设置当前账户的杠杆倍数
 
-        listQuote = util.load_pickle(rootpath.join_relative_path("simple_quote.list"))
-        if listQuote:
-            for x in listQuote:
-                self.account.processQuote((x, x))
+
+
+        dbfile = rootpath.join_relative_path("marketquote.db")
+        conn = sqlite3.connect(dbfile)
+        c = conn.cursor()        
+        cursor = c.execute("SELECT f_lastprice, f_markprice, f_timestamp from t_market order by id")
+        for row in cursor:
+            lastprice = float(row[0])
+            markprice = float(row[1])         
+            dt = datetime.datetime.strptime(row[2], "%Y-%m-%d %H:%M:%S")
+            self.account.processQuote((markprice, lastprice, dt))
+        conn.close()
+
+
+        df = pd.read_csv(rootpath.join_relative_path("marketquote.csv"))
+        if not df.empty:
+            for index, row in df.iterrows():
+                self.account.processQuote((row['price'], row['price'], row['time']))
 
 #===============================================================================
 #===============================================================================

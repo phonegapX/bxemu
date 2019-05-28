@@ -104,9 +104,9 @@ class BacktestAccount(PortfolioManager):
         调用_makeTrade撮合订单
         调用策略的onTick
         """
-        self.lastMarkPrice, self.lastFillPrice = tupleQuote
+        self.lastMarkPrice, self.lastFillPrice, self.lastQuoteTime = tupleQuote
         #
         self._makeTrade()
         #
-        tick = Tick.create(self.lastMarkPrice, self.lastFillPrice)
+        tick = Tick.create(self.lastMarkPrice, self.lastFillPrice, self.lastQuoteTime)
         self.strategy.onTick(tick)
