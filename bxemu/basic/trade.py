@@ -34,7 +34,7 @@ class Trade(object):
         self.time = datetime.now()      #成交时间
 
     @classmethod
-    def create(cls, side, execQty, execPrice, orderType, orderQty, qtyLeft, orderPrice, orderId, tradeType):
+    def create(cls, side, execQty, execPrice, orderType, orderQty, qtyLeft, orderPrice, orderId, tradeType, time):
         trade = cls()
         trade.side = side                                       #方向
         trade.execQty = execQty                                 #成交数量
@@ -51,6 +51,7 @@ class Trade(object):
         trade.qtyLeft = qtyLeft                                 #未成交数量
         trade.orderPrice = orderPrice                           #委托价格
         trade.orderId = orderId                                 #委托ID
+        trade.time = time                                       #成交时间
         return trade
     
     def split(self, base):
@@ -60,7 +61,7 @@ class Trade(object):
         assert self.execQty > base        
         secondPart = self.execQty-base
         trade1 = Trade.create(self.side, base, self.execPrice, self.orderType, self.orderQty, 
-                              self.qtyLeft+secondPart, self.orderPrice, self.orderId, self.tradeType)
+                              self.qtyLeft+secondPart, self.orderPrice, self.orderId, self.tradeType, self.time)
         trade2 = Trade.create(self.side, secondPart, self.execPrice, self.orderType, self.orderQty, 
-                              self.qtyLeft, self.orderPrice, self.orderId, self.tradeType)
+                              self.qtyLeft, self.orderPrice, self.orderId, self.tradeType, self.time)
         return trade1, trade2

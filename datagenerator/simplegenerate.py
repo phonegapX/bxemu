@@ -17,7 +17,6 @@ except NameError:  # Python 3
 import time
 import datetime
 import random
-from decimal import Decimal
 
 import numpy as np
 import pandas as pd
@@ -26,14 +25,6 @@ import matplotlib.pyplot as plt
 import bxemu.util as util
 import rootpath
 
-
-def toNearest(num, tickSize):
-    """Given a number, round it to the nearest tick. Very useful for sussing float error
-       out of numbers: e.g. toNearest(401.46, 0.01) -> 401.46, whereas processing is
-       normally with floats would give you 401.46000000000004.
-       Use this after adding/subtracting/multiplying numbers."""
-    tickDec = Decimal(str(tickSize))
-    return float((Decimal(round(num / tickSize, 0)) * tickDec))
 
 #模拟开始时间
 startDt = datetime.datetime.strptime("2019-5-1 0:0:0", "%Y-%m-%d %H:%M:%S")
@@ -68,7 +59,7 @@ plt.show()
 
 #在生成的100条价格路径中随机选择一条
 index = random.randint(0, 99)
-vfun = np.vectorize(toNearest)
+vfun = np.vectorize(util.toNearest)
 l = vfun(S[:, index], 0.5)
 #生成模拟时间序列
 t = []

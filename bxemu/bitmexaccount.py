@@ -31,12 +31,15 @@ class BacktestAccount(PortfolioManager):
             2.下单数是否超过了持仓数
             """
             stack = inspect.stack()
-            curClass = stack[1][0].f_locals["self"].__class__
-            methodName = stack[1][0].f_code.co_name
-            #print("I was called by {}.{}()".format(str(curClass), methodName))              
-            #print(inspect.getmro(curClass))
-            if methodName != "onTick":
+            has = False
+            for s in stack:
+                if s[0].f_code.co_name == "onTick":
+                    has = True
+                    break
+            if not has:
                 raise Exception("placeOrder方法只能在策略里面被调用")
+            #=======================================================
+            curClass = stack[1][0].f_locals["self"].__class__
             has = False
             for c in inspect.getmro(curClass):
                 if c == StrategyTemplate:
@@ -55,7 +58,7 @@ class BacktestAccount(PortfolioManager):
 
     @preOrderCheck
     def placeOrder(self, side, price, size):
-        order = Order.create(side, price, size, ORDER_TYPE_LIMIT)
+        order = Order.create(side, price, size, ORDER_TYPE_LIMIT, self.lastQuoteTime)
         self.strategy.onOrder(order)
         #尝试成交
         self._deal(order, TRADE_TYPE_TAKER)
@@ -85,7 +88,7 @@ class BacktestAccount(PortfolioManager):
             if self._allowTrade(order, tradeVol, self.lastFillPrice, self.lastMarkPrice, tradeType):
                 #可以成交
                 order.left -= tradeVol  #更新订单的已成交数量
-                trade = Trade.create(order.side, tradeVol, self.lastFillPrice, order.type, order.size, order.left, order.price, order.orderId, tradeType)            
+                trade = Trade.create(order.side, tradeVol, self.lastFillPrice, order.type, order.size, order.left, order.price, order.orderId, tradeType, self.lastQuoteTime)
                 self.strategy.onTrade(trade)
             else:   #不允许成交,取消这个订单
                 order.left = 0

@@ -27,7 +27,7 @@ class Order(object):
         self.status = EMPTY_UNICODE
 
     @classmethod
-    def create(cls, side, price, size, type):
+    def create(cls, side, price, size, type, time):
         order = cls()
         order.side = side
         order.price = price
@@ -35,6 +35,7 @@ class Order(object):
         order.type = type
         order.left = size
         order.status = "New"
+        order.time = time
         return order
 
     @property

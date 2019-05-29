@@ -2,3 +2,4 @@
 
 from .fileio import *
 from .sequence import *
+from .math import *
